@@ -1,0 +1,99 @@
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  color:white;
+  font-family: Arial, sans-serif;
+  text-align:center;
+  background:#0f0f0f;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(168,85,247,.25), transparent 40%),
+    radial-gradient(circle at 80% 25%, rgba(0,229,255,.18), transparent 45%),
+    radial-gradient(circle at 55% 85%, rgba(255,43,214,.15), transparent 50%),
+    linear-gradient(180deg, #0a0a0b, #121214);
+  z-index:-2;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  opacity:.22;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index:-1;
+}
+
+h1{
+  margin:40px 0 8px;
+  font-size:72px;
+  letter-spacing:4px;
+  color:#a855f7;
+  text-shadow: 0 0 18px rgba(168,85,247,.45);
+}
+
+.subtitle{
+  margin:0 0 36px;
+  opacity:.85;
+}
+
+.wall{
+  max-width:900px;
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:18px;
+  justify-items:center;
+}
+
+.tag{
+  width:180px;
+  height:110px;
+  display:grid;
+  place-items:center;
+  text-decoration:none;
+  color:white;
+  font-weight:800;
+  text-transform:uppercase;
+  border-radius:18px;
+  border:2px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(6px);
+  position:relative;
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.tag::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:22px;
+  opacity:.22;
+  filter: blur(10px);
+  z-index:-1;
+}
+
+.tag:hover{
+  transform: translateY(-3px) scale(1.03);
+  border-color: rgba(255,255,255,.35);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.tag-snake::before{ background: rgba(168,85,247,.9); }
+.tag-pong::before{ background: rgba(0,229,255,.85); }
+.tag-reaction::before{ background: rgba(255,43,214,.8); }
+
+@media (max-width: 700px){
+  h1{ font-size:48px; }
+  .wall{ grid-template-columns: 1fr; }
+  .tag{ width:min(320px, 90vw); }
+}

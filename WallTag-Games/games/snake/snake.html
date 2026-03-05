@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Snake | WallTag Games</title>
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --panel:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --muted:rgba(255,255,255,.75);
+      --ink:#fff;
+      --shadow: rgba(0,0,0,.45);
+
+      --grid:rgba(255,255,255,.06);
+      --accent:#a855f7;
+      --ok:#00e5ff;
+      --danger:#ff2bd6;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      display:grid;
+      place-items:center;
+      padding:18px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(168,85,247,.18), transparent 42%),
+        radial-gradient(circle at 85% 25%, rgba(0,229,255,.14), transparent 46%),
+        radial-gradient(circle at 55% 90%, rgba(255,43,214,.12), transparent 55%),
+        linear-gradient(180deg, #070708, #0f0f12);
+    }
+    .wrap{ width:min(980px,100%); display:grid; gap:14px; }
+
+    header{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+      padding:14px 16px;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: 0 12px 30px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .title{ text-align:left; display:grid; gap:2px; }
+    .title h1{ margin:0; font-size:22px; letter-spacing:2px; line-height:1.1; }
+    .title .sub{ color:var(--muted); font-size:13px; }
+
+    .stats{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .pill{
+      padding:8px 10px; border-radius:999px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:13px; color:var(--muted);
+    }
+    .pill b{ color:var(--ink); }
+
+    .gameArea{ display:grid; grid-template-columns: 1fr 320px; gap:14px; align-items:start; }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: 0 12px 30px var(--shadow);
+      backdrop-filter: blur(6px);
+      overflow:hidden;
+    }
+
+    .canvasWrap{ position:relative; padding:16px; }
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:16px;
+      border:2px solid rgba(255,255,255,.14);
+      background:#060607;
+    }
+
+    .overlay{
+      position:absolute; inset:16px;
+      display:grid; place-items:center;
+      border-radius:16px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      text-align:center;
+      padding:16px;
+    }
+    .overlay.hidden{ display:none; }
+    .overlay h2{ margin:0 0 8px; font-size:22px; letter-spacing:1px; }
+    .overlay p{ margin:0 0 14px; color:var(--muted); font-size:14px; line-height:1.35; }
+
+    .btnRow{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    button{
+      appearance:none; border:none;
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:800;
+      color:white;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      min-width:110px;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.28); }
+    button:active{ transform: translateY(0px); }
+
+    .primary{ background: rgba(168,85,247,.35); border-color: rgba(168,85,247,.55); }
+    .primary:hover{ background: rgba(168,85,247,.45); }
+    .ok{ background: rgba(0,229,255,.18); border-color: rgba(0,229,255,.38); }
+    .ok:hover{ background: rgba(0,229,255,.24); }
+    .danger{ background: rgba(255,43,214,.22); border-color: rgba(255,43,214,.42); }
+    .danger:hover{ background: rgba(255,43,214,.30); }
+
+    aside{ padding:14px; display:grid; gap:12px; }
+    .sectionTitle{
+      font-size:13px; color:var(--muted);
+      letter-spacing:1px; text-transform:uppercase;
+    }
+    .row{ display:grid; gap:8px; }
+    label{
+      font-size:13px; color:var(--muted);
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+    }
+    select, input[type="range"]{ width:100%; }
+    select{
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.16);
+      color: white;
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+    }
+    .hint{ font-size:13px; color:var(--muted); line-height:1.35; }
+    .keys{ display:grid; gap:6px; font-size:13px; color:var(--muted); }
+    .keys code{
+      color:white;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      padding:2px 7px;
+      border-radius:9px;
+      margin-right:6px;
+    }
+
+    @media (max-width: 900px){
+      .gameArea{ grid-template-columns: 1fr; }
+      aside{ padding-top:0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>WALLTAG SNAKE</h1>
+        <div class="sub">WASD + arrows. Modes. Skins. Proper arcade energy.</div>
+      </div>
+      <div class="stats">
+        <div class="pill">Score: <b id="score">0</b></div>
+        <div class="pill">Best: <b id="best">0</b></div>
+        <div class="pill">State: <b id="state">Ready</b></div>
+      </div>
+    </header>
+
+    <div class="gameArea">
+      <div class="card canvasWrap">
+        <canvas id="c" width="720" height="720"></canvas>
+
+        <div id="overlay" class="overlay">
+          <div>
+            <h2 id="overlayTitle">Ready?</h2>
+            <p id="overlayText">Pick a skin + mode. Press <b>Start</b> or <b>Space</b>.</p>
+            <div class="btnRow">
+              <button id="startBtn" class="primary">Start</button>
+              <button id="pauseBtn" class="ok">Pause</button>
+              <button id="restartBtn" class="danger">Restart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <aside>
+          <div class="sectionTitle">Settings</div>
+
+          <div class="row">
+            <label for="mode">Game mode <span id="modeDesc">Classic</span></label>
+            <select id="mode">
+              <option value="classic">Classic (walls kill)</option>
+              <option value="wrap">No Walls (wrap around)</option>
+              <option value="speed">Speed Run (faster each food)</option>
+              <option value="frenzy">Food Frenzy (3 foods)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="skin">Snake skin <span id="skinPreview">Neon</span></label>
+            <select id="skin">
+              <option value="neon">Neon (purple glow)</option>
+              <option value="toxic">Toxic (green slime)</option>
+              <option value="ice">Ice (blue chill)</option>
+              <option value="lava">Lava (orange heat)</option>
+              <option value="mono">Mono (white/black)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="speed">Base speed <span id="speedLabel">Normal</span></label>
+            <input id="speed" type="range" min="6" max="18" value="10" />
+            <div class="hint">This is the starting speed. Speed Run mode gets faster as you eat.</div>
+          </div>
+
+          <div class="sectionTitle">Controls</div>
+          <div class="keys">
+            <div><code>↑ ↓ ← →</code> move</div>
+            <div><code>W A S D</code> move</div>
+            <div><code>Space</code> start / pause</div>
+            <div><code>P</code> pause</div>
+            <div><code>R</code> restart</div>
+          </div>
+
+          <div class="sectionTitle">Buttons</div>
+          <div class="btnRow" style="justify-content:flex-start">
+            <button id="startBtn2" class="primary">Start</button>
+            <button id="pauseBtn2" class="ok">Pause</button>
+            <button id="restartBtn2" class="danger">Restart</button>
+          </div>
+
+          <div class="hint">
+            Tip: You can’t instantly reverse direction (that’s snake law 🐍📜).
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================
+    // WallTag Snake (full build)
+    // ==========================
+
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = document.getElementById("score");
+    const bestEl  = document.getElementById("best");
+    const stateEl = document.getElementById("state");
+
+    const overlay = document.getElementById("overlay");
+    const overlayTitle = document.getElementById("overlayTitle");
+    const overlayText  = document.getElementById("overlayText");
+
+    const startBtn   = document.getElementById("startBtn");
+    const pauseBtn   = document.getElementById("pauseBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const startBtn2   = document.getElementById("startBtn2");
+    const pauseBtn2   = document.getElementById("pauseBtn2");
+    const restartBtn2 = document.getElementById("restartBtn2");
+
+    const skinSel = document.getElementById("skin");
+    const skinPreview = document.getElementById("skinPreview");
+    const modeSel = document.getElementById("mode");
+    const modeDesc = document.getElementById("modeDesc");
+    const speedRange = document.getElementById("speed");
+    const speedLabel = document.getElementById("speedLabel");
+
+    // Grid setup
+    const GRID = 24;
+    const CELL = canvas.width / GRID;
+
+    // Skins
+    const SKINS = {
+      neon:  { body:"#a855f7", head:"#d4b1ff", glow:"rgba(168,85,247,.55)", food:"#ff2bd6", foodGlow:"rgba(255,43,214,.55)" },
+      toxic: { body:"#76ff7a", head:"#c7ff6a", glow:"rgba(118,255,122,.40)", food:"#00e5ff", foodGlow:"rgba(0,229,255,.50)" },
+      ice:   { body:"#5bd6ff", head:"#b7f3ff", glow:"rgba(91,214,255,.45)",  food:"#a855f7", foodGlow:"rgba(168,85,247,.50)" },
+      lava:  { body:"#ff8a3d", head:"#ffd3a8", glow:"rgba(255,138,61,.45)",  food:"#00e5ff", foodGlow:"rgba(0,229,255,.45)" },
+      mono:  { body:"#f2f2f2", head:"#ffffff", glow:"rgba(255,255,255,.25)", food:"#a855f7", foodGlow:"rgba(168,85,247,.45)" }
+    };
+
+    function getSkin(){
+      return SKINS[skinSel.value] || SKINS.neon;
+    }
+
+    // Game state
+    let snake, dir, nextDir, foods;
+    let score = 0;
+    let best = Number(localStorage.getItem("walltag_snake_best") || 0);
+    let running = false;
+    let paused = false;
+    let dead = false;
+
+    let baseStepMs = 1000 / Number(speedRange.value);
+    let stepMs = baseStepMs;
+    let lastTime = 0;
+
+    bestEl.textContent = best;
+
+    function setState(t){ stateEl.textContent = t; }
+
+    function showOverlay(title, html){
+      overlayTitle.textContent = title;
+      overlayText.innerHTML = html;
+      overlay.classList.remove("hidden");
+    }
+    function hideOverlay(){
+      overlay.classList.add("hidden");
+    }
+
+    function speedText(v){
+      const n = Number(v);
+      if (n <= 8) return "Chill";
+      if (n <= 12) return "Normal";
+      if (n <= 15) return "Fast";
+      return "Insane";
+    }
+
+    function syncSpeed(){
+      baseStepMs = 1000 / Number(speedRange.value);
+      // If not in speed-run, step speed follows base speed live
+      if (modeSel.value !== "speed") stepMs = baseStepMs;
+      speedLabel.textContent = speedText(speedRange.value);
+    }
+    speedRange.addEventListener("input", syncSpeed);
+    syncSpeed();
+
+    function modeNiceName(v){
+      if (v === "classic") return "Classic";
+      if (v === "wrap") return "No Walls";
+      if (v === "speed") return "Speed Run";
+      if (v === "frenzy") return "Food Frenzy";
+      return "Classic";
+    }
+
+    modeSel.addEventListener("change", () => {
+      modeDesc.textContent = modeNiceName(modeSel.value);
+      // Reset speed if switching away from speed-run
+      syncSpeed();
+      restart();
+    });
+
+    skinSel.addEventListener("change", () => {
+      skinPreview.textContent = skinSel.options[skinSel.selectedIndex].textContent.split(" (")[0];
+      draw();
+    });
+
+    function randCell(){
+      return Math.floor(Math.random() * GRID);
+    }
+
+    function cellOccupied(x,y){
+      return snake.some(p => p.x === x && p.y === y) || foods.some(f => f.x === x && f.y === y);
+    }
+
+    function placeOneFood(){
+      while(true){
+        const fx = randCell();
+        const fy = randCell();
+        if (!cellOccupied(fx,fy)){
+          foods.push({x:fx, y:fy});
+          return;
+        }
+      }
+    }
+
+    function setFoodForMode(){
+      foods = [];
+      const count = (modeSel.value === "frenzy") ? 3 : 1;
+      for (let i=0;i<count;i++) placeOneFood();
+    }
+
+    function resetGame(){
+      const mid = Math.floor(GRID/2);
+      snake = [
+        {x: mid, y: mid},
+        {x: mid-1, y: mid},
+        {x: mid-2, y: mid}
+      ];
+      dir = {x: 1, y: 0};
+      nextDir = {x: 1, y: 0};
+      score = 0;
+      running = false;
+      paused = false;
+      dead = false;
+      lastTime = 0;
+
+      syncSpeed();
+      // In Speed Run, start from base speed every restart
+      stepMs = baseStepMs;
+
+      setFoodForMode();
+
+      scoreEl.textContent = score;
+      setState("Ready");
+      showOverlay("Ready?", "Pick a skin + mode. Press <b>Start</b> or <b>Space</b>.");
+      draw();
+    }
+
+    function start(){
+      if (dead) resetGame();
+      running = true;
+      paused = false;
+      hideOverlay();
+      setState("Running");
+    }
+
+    function togglePause(){
+      if (!running || dead) return;
+      paused = !paused;
+      if (paused){
+        setState("Paused");
+        showOverlay("Paused", "Press <b>Space</b>, <b>P</b>, or click <b>Pause</b> to resume.");
+      } else {
+        hideOverlay();
+        setState("Running");
+      }
+    }
+
+    function restart(){
+      resetGame();
+    }
+
+    function die(){
+      dead = true;
+      running = false;
+      paused = false;
+      setState("Game Over");
+
+      if (score > best){
+        best = score;
+        localStorage.setItem("walltag_snake_best", String(best));
+        bestEl.textContent = best;
+      }
+
+      showOverlay("Game Over", `Score: <b>${score}</b><br>Press <b>Restart</b> or <b>R</b> to go again.`);
+    }
+
+    // Prevent instant reverse
+    function setDir(nx, ny){
+      if (nx === -dir.x && ny === -dir.y) return;
+      nextDir = {x:nx, y:ny};
+    }
+
+    // WASD + Arrows + Space/P/R
+    document.addEventListener("keydown", (e) => {
+      const k = e.key.toLowerCase();
+
+      if (k === " "){
+        e.preventDefault();
+        if (!running && !dead) start();
+        else togglePause();
+        return;
+      }
+      if (k === "p"){ togglePause(); return; }
+      if (k === "r"){ restart(); return; }
+
+      if (!running || paused || dead) return;
+
+      if (k === "arrowup" || k === "w") setDir(0,-1);
+      else if (k === "arrowdown" || k === "s") setDir(0,1);
+      else if (k === "arrowleft" || k === "a") setDir(-1,0);
+      else if (k === "arrowright" || k === "d") setDir(1,0);
+    });
+
+    // Buttons (both sets)
+    [startBtn, startBtn2].forEach(b => b.addEventListener("click", start));
+    [pauseBtn, pauseBtn2].forEach(b => b.addEventListener("click", togglePause));
+    [restartBtn, restartBtn2].forEach(b => b.addEventListener("click", restart));
+
+    // Drawing helpers
+    function drawGrid(){
+      ctx.save();
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--grid").trim() || "rgba(255,255,255,.06)";
+      ctx.lineWidth = 1;
+      for (let i=1;i<GRID;i++){
+        const p = i*CELL;
+        ctx.beginPath(); ctx.moveTo(p,0); ctx.lineTo(p,canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,p); ctx.lineTo(canvas.width,p); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function roundRect(x,y,w,h,r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr,y);
+      ctx.arcTo(x+w,y,x+w,y+h,rr);
+      ctx.arcTo(x+w,y+h,x,y+h,rr);
+      ctx.arcTo(x,y+h,x,y,rr);
+      ctx.arcTo(x,y,x+w,y,rr);
+      ctx.closePath();
+    }
+
+    function drawCell(x,y,fill,glow,round=8){
+      const px = x*CELL;
+      const py = y*CELL;
+      const pad = 2;
+      ctx.save();
+      if (glow){
+        ctx.shadowColor = glow;
+        ctx.shadowBlur = 18;
+      }
+      ctx.fillStyle = fill;
+      roundRect(px+pad, py+pad, CELL-pad*2, CELL-pad*2, round);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // vignette-ish background
+      const g = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.width*0.15, canvas.width/2, canvas.height/2, canvas.width*0.7);
+      g.addColorStop(0, "rgba(255,255,255,.02)");
+      g.addColorStop(1, "rgba(0,0,0,.55)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      drawGrid();
+
+      const skin = getSkin();
+
+      // foods
+      for (const f of foods){
+        drawCell(f.x, f.y, skin.food, skin.foodGlow, 10);
+      }
+
+      // snake
+      for (let i=snake.length-1; i>=0; i--){
+        const p = snake[i];
+        const isHead = i === 0;
+        drawCell(p.x, p.y, isHead ? skin.head : skin.body, skin.glow, isHead ? 10 : 8);
+
+        // little shine dot
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,.10)";
+        ctx.beginPath();
+        ctx.arc(p.x*CELL + CELL*0.35, p.y*CELL + CELL*0.35, CELL*0.10, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function eatFoodAt(x,y){
+      const idx = foods.findIndex(f => f.x === x && f.y === y);
+      if (idx === -1) return false;
+
+      foods.splice(idx,1);
+      score += 1;
+      scoreEl.textContent = score;
+
+      // Speed Run: increase speed slightly each food
+      if (modeSel.value === "speed"){
+        stepMs = Math.max(35, stepMs * 0.95);
+      }
+
+      // Replace the eaten food
+      placeOneFood();
+
+      return true;
+    }
+
+    function step(){
+      dir = nextDir;
+
+      let nx = snake[0].x + dir.x;
+      let ny = snake[0].y + dir.y;
+
+      // wrap mode
+      if (modeSel.value === "wrap"){
+        if (nx < 0) nx = GRID - 1;
+        if (nx >= GRID) nx = 0;
+        if (ny < 0) ny = GRID - 1;
+        if (ny >= GRID) ny = 0;
+      } else {
+        // classic walls
+        if (nx < 0 || ny < 0 || nx >= GRID || ny >= GRID){
+          die();
+          return;
+        }
+      }
+
+      // self collision
+      if (snake.some((p, i) => i !== 0 && p.x === nx && p.y === ny)){
+        die();
+        return;
+      }
+
+      snake.unshift({x:nx, y:ny});
+
+      const ate = eatFoodAt(nx,ny);
+
+      if (!ate){
+        snake.pop();
+      }
+
+      draw();
+    }
+
+    function loop(t){
+      requestAnimationFrame(loop);
+      if (!running || paused || dead) return;
+
+      if (!lastTime) lastTime = t;
+      const elapsed = t - lastTime;
+
+      if (elapsed >= stepMs){
+        lastTime = t;
+        step();
+      }
+    }
+
+    // Boot
+    resetGame();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
