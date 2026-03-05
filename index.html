@@ -1,20 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>WallTag Games</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <header class="top">
+    <div class="brand">
+      <div class="spray">WALLTAG</div>
+      <div class="spray glow">GAMES</div>
+      <div class="tagline">Every tag is a game.</div>
+    </div>
 
-  <h1>WALLTAG GAMES</h1>
-  <p class="subtitle">Every tag is a game.</p>
+    <div class="statusPanel">
+      <div class="chip">Status: <b>Online</b></div>
+      <div class="chip">Version: <b>v0.1</b></div>
+      <div class="chip">Built by: <b>Logan</b></div>
+    </div>
+  </header>
 
-  <div class="wall">
-    <a class="tag" href="games/snake/snake.html">Snake</a>
-    <a class="tag" href="games/pong/pong.html">Pong</a>
-    <a class="tag" href="games/reaction/reaction.html">Reaction</a>
-  </div>
+  <main class="main">
+    <section class="grid">
+      <!-- PLAYABLE -->
+      <a class="card playable" href="games/snake/snake.html">
+        <div class="cardTop">
+          <span class="badge live">LIVE</span>
+          <span class="badge mode">Arcade</span>
+        </div>
+        <h2>Snake</h2>
+        <p>Skins, modes, WASD, start/pause/restart.</p>
+        <div class="cardBottom">
+          <span class="pill">Best score saved</span>
+          <span class="arrow">▶</span>
+        </div>
+      </a>
+
+      <!-- COMING SOON -->
+      <a class="card soon" href="#" aria-disabled="true">
+        <div class="cardTop">
+          <span class="badge soonBadge">SOON</span>
+          <span class="badge mode">Reflex</span>
+        </div>
+        <h2>Reaction</h2>
+        <p>Click when it turns green. Millisecond battles.</p>
+        <div class="cardBottom">
+          <span class="pill">Coming next</span>
+          <span class="arrow">⧗</span>
+        </div>
+      </a>
+
+      <a class="card soon" href="#" aria-disabled="true">
+        <div class="cardTop">
+          <span class="badge soonBadge">SOON</span>
+          <span class="badge mode">Classic</span>
+        </div>
+        <h2>Pong</h2>
+        <p>1P vs AI. Clean physics. Neon court.</p>
+        <div class="cardBottom">
+          <span class="pill">In progress</span>
+          <span class="arrow">⧗</span>
+        </div>
+      </a>
+
+      <a class="card soon" href="#" aria-disabled="true">
+        <div class="cardTop">
+          <span class="badge soonBadge">SOON</span>
+          <span class="badge mode">WallTag</span>
+        </div>
+        <h2>???</h2>
+        <p>A mystery cabinet. You’ll name it later.</p>
+        <div class="cardBottom">
+          <span class="pill">Secret slot</span>
+          <span class="arrow">⧗</span>
+        </div>
+      </a>
+    </section>
+
+    <section class="lower">
+      <div class="panel">
+        <h3>Changelog</h3>
+        <ul>
+          <li><b>v0.1</b> WallTag Games launched</li>
+          <li>Snake added with skins + modes</li>
+          <li>GitHub Pages website live</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>How to play</h3>
+        <p>
+          Pick a cabinet, press <b>Start</b>, and chase high scores.
+          Reaction and Pong are coming soon.
+        </p>
+        <div class="tiny">
+          Tip: Bookmark this page on school computers so you can open it instantly.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>© WallTag Games</div>
+    <div class="muted">“Every tag is a game.”</div>
+  </footer>
 
   <script src="script.js"></script>
 </body>
