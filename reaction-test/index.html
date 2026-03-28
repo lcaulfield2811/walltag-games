@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reaction Test</title>
+<style>
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+#number {
+  font-size: 100px;
+  margin: 30px 0;
+}
+
+button, a {
+  padding: 12px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  background: white;
+  color: black;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+<div>
+  <h1>Reaction Test</h1>
+  <p>Wait for 0 → press SPACE</p>
+
+  <div id="number">-</div>
+  <p id="status">Press Start</p>
+
+  <button onclick="start()">Start</button>
+  <a href="../">Back</a>
+
+  <p id="result"></p>
+</div>
+
+<script>
+let running = false;
+let ready = false;
+let startTime;
+
+function randomNum() {
+  return Math.floor(Math.random() * 10);
+}
+
+function start() {
+  running = true;
+  ready = false;
+  document.getElementById("result").textContent = "";
+  document.getElementById("status").textContent = "Wait for 0...";
+
+  next();
+}
+
+function next() {
+  if (!running) return;
+
+  let num = randomNum();
+  document.getElementById("number").textContent = num;
+
+  if (num === 0) {
+    ready = true;
+    startTime = performance.now();
+    document.getElementById("status").textContent = "PRESS SPACE!";
+    return;
+  }
+
+  setTimeout(next, Math.random() * 700 + 300);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.code !== "Space") return;
+
+  if (!running) return;
+
+  if (ready) {
+    let time = Math.round(performance.now() - startTime);
+    document.getElementById("result").textContent = time + " ms";
+    running = false;
+  } else {
+    document.getElementById("result").textContent = "Too early!";
+    running = false;
+  }
+});
+</script>
+
+</body>
+</html>
