@@ -1,103 +1,486 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Reaction Test</title>
-<style>
-body {
-  margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
-}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WallTag Games | Reaction Test</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-#number {
-  font-size: 100px;
-  margin: 30px 0;
-}
+    :root {
+      --bg1: #0a0f1f;
+      --bg2: #111827;
+      --panel: rgba(10, 14, 30, 0.88);
+      --line: rgba(138, 180, 255, 0.22);
+      --text: #f3f7ff;
+      --muted: #9fb0d1;
+      --cyan: #7dd3fc;
+      --purple: #a78bfa;
+      --green: #4ade80;
+      --red: #fb7185;
+      --yellow: #facc15;
+    }
 
-button, a {
-  padding: 12px 20px;
-  margin: 10px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  background: white;
-  color: black;
-  text-decoration: none;
-}
-</style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(124, 58, 237, 0.22), transparent 30%),
+        radial-gradient(circle at bottom, rgba(59, 130, 246, 0.18), transparent 35%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow: hidden;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cabinet {
+      width: 100%;
+      max-width: 850px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 0 30px rgba(125, 211, 252, 0.08),
+        0 0 70px rgba(167, 139, 250, 0.08);
+      padding: 26px;
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .logo .wall {
+      color: white;
+    }
+
+    .logo .tag {
+      color: var(--cyan);
+      text-shadow: 0 0 12px rgba(125, 211, 252, 0.45);
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .screen {
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+        rgba(4, 8, 20, 0.86);
+      padding: 24px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow:
+        inset 0 0 28px rgba(0,0,0,0.45),
+        0 0 24px rgba(0,0,0,0.15);
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .mode {
+      color: var(--cyan);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .instructions {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 22px;
+    }
+
+    .instructions h2 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+      color: var(--cyan);
+    }
+
+    .instructions p {
+      margin: 8px 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .instructions strong {
+      color: white;
+    }
+
+    .display-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .display {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at center, rgba(167, 139, 250, 0.12), transparent 55%),
+        rgba(8, 12, 26, 0.95);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      box-shadow:
+        inset 0 0 24px rgba(0,0,0,0.35),
+        0 0 20px rgba(125, 211, 252, 0.06);
+      padding: 20px;
+    }
+
+    .number {
+      font-size: clamp(5rem, 18vw, 9rem);
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 0 18px rgba(255,255,255,0.1);
+    }
+
+    .label {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .panel-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .big {
+      font-size: 1.45rem;
+      font-weight: 800;
+      min-height: 1.6em;
+    }
+
+    .status-wait { color: var(--yellow); }
+    .status-go { color: var(--green); text-shadow: 0 0 14px rgba(74, 222, 128, 0.3); }
+    .status-bad { color: var(--red); }
+    .status-info { color: var(--cyan); }
+
+    .number.zero {
+      color: var(--green);
+      text-shadow: 0 0 18px rgba(74, 222, 128, 0.35);
+    }
+
+    .number.normal {
+      color: white;
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+      .panel-row {
+        grid-template-columns: 1fr;
+      }
+
+      .cabinet {
+        padding: 18px;
+      }
+
+      .screen {
+        min-height: 0;
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="grid-bg"></div>
 
-<div>
-  <h1>Reaction Test</h1>
-  <p>Wait for 0 → press SPACE</p>
+  <div class="wrap">
+    <div class="cabinet">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"><span class="wall">WALL</span><span class="tag">TAG</span> GAMES</div>
+          <div class="sub">Arcade Cabinet: Reaction Test</div>
+        </div>
 
-  <div id="number">-</div>
-  <p id="status">Press Start</p>
+        <div class="chips">
+          <div class="chip">Status: <strong>Live</strong></div>
+          <div class="chip">Mode: <strong>Reflex</strong></div>
+          <div class="chip">Key: <strong>Space</strong></div>
+        </div>
+      </div>
 
-  <button onclick="start()">Start</button>
-  <a href="../">Back</a>
+      <div class="screen">
+        <div>
+          <div class="head">
+            <div>
+              <div class="mode">Reflex Challenge</div>
+              <h1>Reaction Test</h1>
+            </div>
+          </div>
 
-  <p id="result"></p>
-</div>
+          <div class="instructions" id="instructionsBox">
+            <h2>How to play</h2>
+            <p>1. Press <strong>Space</strong> to begin.</p>
+            <p>2. Watch the number change randomly.</p>
+            <p>3. Do <strong>not</strong> press early.</p>
+            <p>4. The moment the number becomes <strong>0</strong>, press <strong>Space</strong> as fast as you can.</p>
+          </div>
 
-<script>
-let running = false;
-let ready = false;
-let startTime;
+          <div class="display-area">
+            <div class="display">
+              <div class="number normal" id="numberDisplay">-</div>
+              <div class="label">Wait for the round to begin</div>
+            </div>
+          </div>
+        </div>
 
-function randomNum() {
-  return Math.floor(Math.random() * 10);
-}
+        <div>
+          <div class="panel-row">
+            <div class="panel">
+              <div class="panel-title">Status</div>
+              <div class="big status-info" id="statusText">Press Space to start</div>
+            </div>
 
-function start() {
-  running = true;
-  ready = false;
-  document.getElementById("result").textContent = "";
-  document.getElementById("status").textContent = "Wait for 0...";
+            <div class="panel">
+              <div class="panel-title">Result</div>
+              <div class="big" id="resultText">No run yet</div>
+            </div>
+          </div>
 
-  next();
-}
+          <div class="footer">
+            Press <strong>Space</strong> to play • Press too early and the round resets
+            <br />
+            <a class="back" href="../index.html">← Back to WallTag Games</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-function next() {
-  if (!running) return;
+  <script>
+    const numberDisplay = document.getElementById("numberDisplay");
+    const statusText = document.getElementById("statusText");
+    const resultText = document.getElementById("resultText");
 
-  let num = randomNum();
-  document.getElementById("number").textContent = num;
+    let gameState = "ready";
+    let startTime = 0;
+    let timeoutId = null;
 
-  if (num === 0) {
-    ready = true;
-    startTime = performance.now();
-    document.getElementById("status").textContent = "PRESS SPACE!";
-    return;
-  }
+    function randomNumber() {
+      return Math.floor(Math.random() * 10);
+    }
 
-  setTimeout(next, Math.random() * 700 + 300);
-}
+    function clearRoundTimer() {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    }
 
-document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space") return;
+    function setStatus(message, className) {
+      statusText.textContent = message;
+      statusText.className = "big " + className;
+    }
 
-  if (!running) return;
+    function showInstructionsState() {
+      clearRoundTimer();
+      gameState = "ready";
+      numberDisplay.textContent = "-";
+      numberDisplay.className = "number normal";
+      setStatus("Press Space to start", "status-info");
+      resultText.textContent = "No run yet";
+    }
 
-  if (ready) {
-    let time = Math.round(performance.now() - startTime);
-    document.getElementById("result").textContent = time + " ms";
-    running = false;
-  } else {
-    document.getElementById("result").textContent = "Too early!";
-    running = false;
-  }
-});
-</script>
+    function startRound() {
+      clearRoundTimer();
+      gameState = "waiting";
+      numberDisplay.textContent = "-";
+      numberDisplay.className = "number normal";
+      resultText.textContent = "Watch closely...";
+      setStatus("Wait for 0", "status-wait");
 
+      const firstDelay = Math.floor(Math.random() * 1000) + 500;
+      timeoutId = setTimeout(showNextNumber, firstDelay);
+    }
+
+    function showNextNumber() {
+      if (gameState !== "waiting") return;
+
+      const num = randomNumber();
+      numberDisplay.textContent = num;
+
+      if (num === 0) {
+        gameState = "go";
+        numberDisplay.className = "number zero";
+        startTime = performance.now();
+        setStatus("0 is live. PRESS SPACE!", "status-go");
+        return;
+      }
+
+      numberDisplay.className = "number normal";
+      const nextDelay = Math.floor(Math.random() * 700) + 250;
+      timeoutId = setTimeout(showNextNumber, nextDelay);
+    }
+
+    function tooEarly() {
+      clearRoundTimer();
+      gameState = "restart";
+      numberDisplay.textContent = "X";
+      numberDisplay.className = "number normal";
+      setStatus("Too early!", "status-bad");
+      resultText.textContent = "Press Space to try again";
+    }
+
+    function finishRound() {
+      clearRoundTimer();
+      const reactionTime = Math.round(performance.now() - startTime);
+      gameState = "restart";
+      numberDisplay.textContent = "0";
+      numberDisplay.className = "number zero";
+      setStatus("Nice reaction!", "status-go");
+      resultText.textContent = `Your time: ${reactionTime} ms • Press Space to restart`;
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.code !== "Space") return;
+      event.preventDefault();
+
+      if (gameState === "ready") {
+        startRound();
+        return;
+      }
+
+      if (gameState === "waiting") {
+        tooEarly();
+        return;
+      }
+
+      if (gameState === "go") {
+        finishRound();
+        return;
+      }
+
+      if (gameState === "restart") {
+        startRound();
+      }
+    });
+
+    showInstructionsState();
+  </script>
 </body>
 </html>
