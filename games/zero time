@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaction Test</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 700px;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #ccc;
+    }
+
+    #numberDisplay {
+      font-size: 8rem;
+      font-weight: bold;
+      margin: 40px 0;
+    }
+
+    #status {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      min-height: 40px;
+    }
+
+    #result {
+      font-size: 1.8rem;
+      margin-top: 20px;
+      color: #00ff99;
+      min-height: 40px;
+    }
+
+    button, a {
+      display: inline-block;
+      margin: 10px;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: white;
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .warning {
+      color: #ff5c5c !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Reaction Test</h1>
+    <p>Wait until the number becomes <strong>0</strong>, then press <strong>Space</strong> as fast as you can.</p>
+
+    <div id="numberDisplay">-</div>
+    <div id="status">Press Start to begin</div>
+
+    <button id="startBtn">Start</button>
+    <a href="../">Back to Library</a>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const numberDisplay = document.getElementById("numberDisplay");
+    const statusText = document.getElementById("status");
+    const resultText = document.getElementById("result");
+    const startBtn = document.getElementById("startBtn");
+
+    let gameRunning = false;
+    let canReact = false;
+    let startTime = 0;
+    let timeoutId = null;
+
+    function getRandomNumber() {
+      return Math.floor(Math.random() * 10);
+    }
+
+    function resetGame() {
+      gameRunning = false;
+      canReact = false;
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+
+    function showRandomNumber() {
+      if (!gameRunning) return;
+
+      const num = getRandomNumber();
+      numberDisplay.textContent = num;
+
+      if (num === 0) {
+        canReact = true;
+        startTime = performance.now();
+        statusText.textContent = "PRESS SPACE!";
+        return;
+      }
+
+      const nextDelay = Math.floor(Math.random() * 700) + 250;
+      timeoutId = setTimeout(showRandomNumber, nextDelay);
+    }
+
+    function startGame() {
+      resetGame();
+      gameRunning = true;
+      resultText.textContent = "";
+      resultText.classList.remove("warning");
+      statusText.textContent = "Wait for 0...";
+      statusText.classList.remove("warning");
+      numberDisplay.textContent = "-";
+
+      const firstDelay = Math.floor(Math.random() * 1200) + 500;
+      timeoutId = setTimeout(showRandomNumber, firstDelay);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code !== "Space") return;
+
+      e.preventDefault();
+
+      if (!gameRunning) return;
+
+      if (canReact) {
+        const reactionTime = Math.round(performance.now() - startTime);
+        resultText.textContent = `Reaction Time: ${reactionTime} ms`;
+        statusText.textContent = "Nice. Press Start to play again.";
+        resetGame();
+      } else {
+        resultText.textContent = "Too early!";
+        resultText.classList.add("warning");
+        statusText.textContent = "You pressed before 0 appeared.";
+        statusText.classList.add("warning");
+        resetGame();
+      }
+    });
+
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
