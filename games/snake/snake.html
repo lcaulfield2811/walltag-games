@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Snake | WallTag Games</title>
   <style>
+    .backBtn{
+  min-width:auto;
+  padding:10px 14px;
+  border-radius:14px;
+  background: rgba(168,85,247,.22);
+  border:1px solid rgba(168,85,247,.45);
+  color:white;
+  font-weight:800;
+}
+.backBtn:hover{
+  background: rgba(168,85,247,.32);
+}
     :root{
       --bg:#0b0b0c;
       --panel:rgba(255,255,255,.06);
@@ -36,7 +48,7 @@
     .wrap{ width:min(980px,100%); display:grid; gap:14px; }
 
     header{
-      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:14px 16px;
       background:var(--panel);
       border:1px solid var(--border);
@@ -254,12 +266,13 @@
     const overlayTitle = document.getElementById("overlayTitle");
     const overlayText  = document.getElementById("overlayText");
 
-    const startBtn   = document.getElementById("startBtn");
-    const pauseBtn   = document.getElementById("pauseBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const startBtn2   = document.getElementById("startBtn2");
-    const pauseBtn2   = document.getElementById("pauseBtn2");
-    const restartBtn2 = document.getElementById("restartBtn2");
+   const startBtn   = document.getElementById("startBtn");
+const pauseBtn   = document.getElementById("pauseBtn");
+const restartBtn = document.getElementById("restartBtn");
+const startBtn2   = document.getElementById("startBtn2");
+const pauseBtn2   = document.getElementById("pauseBtn2");
+const restartBtn2 = document.getElementById("restartBtn2");
+const backBtn = document.getElementById("backBtn");
 
     const skinSel = document.getElementById("skin");
     const skinPreview = document.getElementById("skinPreview");
@@ -469,7 +482,9 @@
     [startBtn, startBtn2].forEach(b => b.addEventListener("click", start));
     [pauseBtn, pauseBtn2].forEach(b => b.addEventListener("click", togglePause));
     [restartBtn, restartBtn2].forEach(b => b.addEventListener("click", restart));
-
+backBtn.addEventListener("click", () => {
+  window.location.href = "/walltag-games/";
+});
     // Drawing helpers
     function drawGrid(){
       ctx.save();
