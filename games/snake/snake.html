@@ -450,10 +450,11 @@ const backBtn = document.getElementById("backBtn");
     }
 
     function die(){
-      dead = true;
-      running = false;
-      paused = false;
-      setState("Game Over");
+  playSound(sounds.gameover); // 👈 ADD THIS LINE
+  dead = true;
+  running = false;
+  paused = false;
+  setState("Game Over");
 
       if (score > best){
         best = score;
@@ -632,10 +633,11 @@ backBtn.addEventListener("click", () => {
 
       const ate = eatFoodAt(nx,ny);
 
-      if (!ate){
-        snake.pop();
-      }
-
+if (ate) {
+  playSound(sounds.food); // 🔊 sound when eating
+} else {
+  snake.pop();
+}
       draw();
     }
 
