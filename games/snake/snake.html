@@ -473,16 +473,27 @@ const backBtn = document.getElementById("backBtn");
 
     // WASD + Arrows + Space/P/R
     document.addEventListener("keydown", (e) => {
-      const k = e.key.toLowerCase();
+  const k = e.key.toLowerCase();
 
-      if (k === " "){
-        e.preventDefault();
-        if (!running && !dead) start();
-        else togglePause();
-        return;
-      }
-      if (k === "p"){ togglePause(); return; }
-      if (k === "r"){ restart(); return; }
+  if (k === " "){
+    e.preventDefault();
+    playSound(sounds.click); // 🔊 space press
+    if (!running && !dead) start();
+    else togglePause();
+    return;
+  }
+
+  if (k === "p"){
+    playSound(sounds.click); // 🔊 pause key
+    togglePause();
+    return;
+  }
+
+  if (k === "r"){
+    playSound(sounds.click); // 🔊 restart key
+    restart();
+    return;
+  }
 
       if (!running || paused || dead) return;
 
